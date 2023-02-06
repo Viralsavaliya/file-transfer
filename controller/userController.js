@@ -23,6 +23,22 @@ exports.getAllUser = async (req, res) => {
             message: error.message
         })
     }
+}   
+exports.oneuser = async (req, res) => {
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+
+    const ipaddress = user.ipaddress
+
+    // res.status(200).json({
+    //     success: true,
+    //     data: ipaddress,
+    //     message: "ipaddress get succesfully"
+    // })
+    res.render('user', {
+        users: ipaddress
+    })
 }
 
 exports.addUser = async (req, res) => {

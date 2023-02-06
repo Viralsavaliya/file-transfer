@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>filetransfer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/home.css">
+</head>
+
+<body>
+
+    <div class="container-fluid  ">
+        <div class="row-12 text-center text-black-50 ">
+            <h2>prestious IT</h2>
+        </div>
+        <div class="row ">
+
+            <div class="col-lg-10 col-md-12  bg-success  border border-danger p-0  imagess">
+                <form class="form-container" enctype='multipart/form-data'>
+                    <div class="upload-files-container">
+                        <div class="drag-file-area">
+                            <span class="material-icons-outlined upload-icon"> file_upload </span>
+                            <h3 class="dynamic-message"> Drag & drop any file here </h3>
+                            <label class="label"> or <span class="browse-files">
+                                    <input type="file" class="default-file-input" id="file-input" /> <span
+                                        class="browse-files-text">browse file</span>
+                                    <span>from device</span> </span> </label>
+                        </div>
+                        <span class="cannot-upload-message"> <span class="material-icons-outlined">error</span> Please
+                            select a file first <span class="material-icons-outlined cancel-alert-button">cancel</span>
+                        </span>
+
+                </form>
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <script>
+        const socket = io();
+        document.querySelector("#file-input").addEventListener("change", function (e) {
+            let file = e.target.files[0];
+            if (!file) {
+                return;
+            }
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                let buffer = new Uint8Array(reader.result);
+
+                let el = document.createElement("div");
+                el.classList.add("item");
+                el.innerHTML = `
+					<div class="progress">0%</div>
+					<div class="filename">${file.name}</div>
+			`;
+                document.querySelector(".files-list").appendChild(el);
+                shareFile({
+                    filename: file.name,
+                    total_buffer_size: buffer.length,
+                    buffer_size: 524288,
+                }, buffer, el.querySelector(".progress"));
+            }
+            reader.readAsArrayBuffer(file);
+        });
+
+
+        function shareFile(metadata, buffer, progress_node) {
+            socket.emit("file-meta", {
+                uid: receiverID,
+                metadata: metadata
+            });
+
+            socket.on("fs-share", function () {
+                let chunk = buffer.slice(0, metadata.buffer_size);
+                buffer = buffer.slice(metadata.buffer_size, buffer.length);
+                progress_node.innerText = Math.trunc(((metadata.total_buffer_size - buffer.length) / metadata.total_buffer_size * 100)) + "%";
+                if (chunk.length != 0) {
+                    socket.emit("file-raw", {
+                        uid: receiverID,
+                        buffer: chunk
+                    });
+                } else {
+                    console.log("Sent file successfully");
+                }
+            });
+        }
+
+
+        socket.on("fs-share", function (buffer) {
+            // console.log("Buffer", buffer);
+            fileShare.buffer.push(buffer);
+            fileShare.transmitted += buffer.byteLength;
+            fileShare.progrss_node.innerText = Math.trunc(fileShare.transmitted / fileShare.metadata.total_buffer_size * 100) + "%";
+            if (fileShare.transmitted == fileShare.metadata.total_buffer_size) {
+                // console.log("Download file: ", fileShare);
+                download(new Blob(fileShare.buffer), fileShare.metadata.filename);
+                fileShare = {};
+            } else {
+                socket.emit("fs-start", {
+                    uid: sender_uid
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
