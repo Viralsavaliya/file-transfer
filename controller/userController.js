@@ -23,7 +23,7 @@ exports.getAllUser = async (req, res) => {
             message: error.message
         })
     }
-}   
+}
 exports.oneuser = async (req, res) => {
     const { id } = req.params;
 
