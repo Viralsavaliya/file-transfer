@@ -116,3 +116,18 @@ exports.deleteUser = async (req, res) => {
         })
     }
 }
+
+
+exports.getlist = (req, res) => {
+    let a = 0
+    console.log('app call at a time')
+    while (true) {
+        // console.log(`while loop call ${a += 1}`)
+
+    }
+    // res.status(200).json({
+    //     // success: true,
+    //     message: "get list one page"
+    // })
+
+}
