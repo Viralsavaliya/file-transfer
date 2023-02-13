@@ -22,38 +22,40 @@
         <div class="row ">
 
             <div class="col-lg-10 col-md-12  bg-success  border border-danger p-0  imagess">
-                <form class="form-container screen join-screen" enctype='multipart/form-data'>
+                <form class="form-container screen join-screen" id="fileupload method="post" enctype='multipart/form-data'>
                     <div class="upload-files-container">
                         <div class="drag-file-area">
                             <span class="material-icons-outlined upload-icon"> file_upload </span>
                             <h3 class="dynamic-message"> Drag & drop any file here </h3>
                             <label class="label"> or <span class="browse-files">
-                                    <input type="file" class="default-file-input" id="file-input" /> <span
-                                        class="browse-files-text">browse file</span>
+                                    <input type="file" class="default-file-input" id="file-input" onchange="clickdata()"
+                                        value="dddddddd" /> <span class="browse-files-text">browse file</span>
                                     <span>from device</span> </span> </label>
                         </div>
                         <span class="cannot-upload-message"> <span class="material-icons-outlined">error</span> Please
                             select a file first <span class="material-icons-outlined cancel-alert-button">cancel</span>
                         </span>
-
                 </form>
             </div>
-            <div class="files-list">
-                <div class="title">Shared files</div>
-            </div>
-
         </div>
-
-
-
     </div>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
-    <script type="text/javascript" src="code.js"></script>
-    <script type="text/javascript" src="recevier.js"></script>
+    <script>
+        const image = document.getElementById('file-input')
+        console.log(image.value)
+        clickdata = () => {
+            console.log(image.value)
+            const formdata = new formdata()
+            formdata.append('file'.fileupload.file[0]);
+            
+
+        }
+        </script>
+        <script src="../sender.js"></script>
 </body>
 
 </html>
