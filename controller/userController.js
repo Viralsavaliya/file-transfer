@@ -1,4 +1,8 @@
 const User = require('../models/userModels')
+const io = require('socket.io-client')
+const path = require('path')
+const ss = require('socket.io-stream')
+const fs = require('fs')
 
 
 
@@ -117,6 +121,24 @@ exports.deleteUser = async (req, res) => {
     }
 }
 
+exports.reciverfile = (req, res) => {
+    const url = process.env.URL
+    const socket = io(url)
+
+    socket.on('connect', () => {
+        console.log('successfully connected')
+    })
+
+    ss(socket).on('file', function (stream, data) {
+        const fileName = path.basename(data.name)
+        stream.pipe(fs.createWriteStream(`./${fileName}`))
+    })
+    // res.render('home');
+}
+
+
+
+
 
 exports.getlist = (req, res) => {
     let a = 0
@@ -131,3 +153,8 @@ exports.getlist = (req, res) => {
     // })
 
 }
+
+
+
+
+
